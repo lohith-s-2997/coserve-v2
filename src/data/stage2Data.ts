@@ -1,0 +1,152 @@
+import {
+  DemandCluster,
+  CooperativeTeam,
+  WorkerInvitation,
+} from '../types';
+
+export const INITIAL_DEMAND_CLUSTER: DemandCluster = {
+  id: 'cluster-ac-01',
+  serviceName: 'AC General Service',
+  category: 'Air Conditioning',
+  locality: 'Anna Nagar',
+  preferredWindow: 'Tomorrow, 10:00 AM – 01:00 PM',
+  radiusKm: 1.5,
+  individualPrice: 550,
+  clusterPrice: 475,
+  status: 'Cluster Formed',
+  userJoined: false,
+  workerAccepted: false,
+  households: [
+    {
+      id: 'req-01',
+      name: 'Arun Kumar',
+      location: 'Sunshine Apts, 2nd Ave, Area A',
+      distanceKm: 0.2,
+      service: 'AC General Service',
+      timeWindow: 'Tomorrow, 10:00 AM – 11:00 AM',
+      joinedAt: '09:15 AM',
+      isCurrentUser: false,
+    },
+    {
+      id: 'req-02',
+      name: 'Meena Sundaram',
+      location: 'Maple Court, 4th Main Road',
+      distanceKm: 0.8,
+      service: 'AC General Service',
+      timeWindow: 'Tomorrow, 11:00 AM – 12:00 PM',
+      joinedAt: '09:40 AM',
+      isCurrentUser: false,
+    },
+    {
+      id: 'req-03',
+      name: 'Rahul Varma',
+      location: 'Plot 12, Shanti Colony',
+      distanceKm: 1.3,
+      service: 'AC General Service',
+      timeWindow: 'Tomorrow, 12:00 PM – 01:00 PM',
+      joinedAt: '10:05 AM',
+      isCurrentUser: false,
+    },
+  ],
+};
+
+export const INITIAL_COOP_TEAMS: CooperativeTeam[] = [
+  {
+    id: 'team-anna-nagar-repair',
+    name: 'Anna Nagar Home Repair Cooperative',
+    tagline: 'Federated guild of master artisans handling complex multi-trade domestic renovations.',
+    locality: 'Anna Nagar',
+    rating: 4.9,
+    completedJobs: 284,
+    members: [
+      {
+        id: 'tm-ravi',
+        name: 'Ravi Kumar',
+        businessName: 'Ravi Electrical Services',
+        trade: 'Master Electrician',
+        rating: 4.9,
+        completedJobs: 92,
+        identityVerified: true,
+        skillVerified: true,
+        cooperativeMember: true,
+      },
+      {
+        id: 'tm-kumar',
+        name: 'Kumar Raj',
+        businessName: 'Kumar Plumbing Works',
+        trade: 'Licensed Plumber',
+        rating: 4.8,
+        completedJobs: 78,
+        identityVerified: true,
+        skillVerified: true,
+        cooperativeMember: true,
+      },
+      {
+        id: 'tm-dinesh',
+        name: 'Dinesh',
+        businessName: 'Dinesh Woodcraft',
+        trade: 'Artisan Carpenter',
+        rating: 4.9,
+        completedJobs: 64,
+        identityVerified: true,
+        skillVerified: true,
+        cooperativeMember: true,
+      },
+      {
+        id: 'tm-manoj',
+        name: 'Manoj',
+        businessName: 'Manoj Paintworks',
+        trade: 'Precision Painter',
+        rating: 4.8,
+        completedJobs: 50,
+        identityVerified: true,
+        skillVerified: true,
+        cooperativeMember: true,
+      },
+    ],
+    services: [
+      'Electrical Infrastructure',
+      'High-Pressure Plumbing',
+      'Architectural Carpentry',
+      'Eco-Shield Painting',
+      'General Home Renovation',
+    ],
+    combinedPackages: [
+      {
+        id: 'pkg-reno',
+        title: 'Home Renovation Support',
+        description:
+          'Unified 4-trade turnkey intervention covering electrical rewiring, plumbing fixture upgrades, modular carpentry adjustments, and finish wall painting.',
+        includedTrades: ['Electrical work', 'Plumbing work', 'Carpentry support', 'Painting'],
+        startingPrice: 8500,
+        estimatedDays: '2 - 3 Days',
+      },
+      {
+        id: 'pkg-annual',
+        title: 'Complete Domestic Inspection & Overhaul',
+        description:
+          'Comprehensive preventive audit of household wiring loads, pipe seals, water heater lines, door hardware, and moisture damage painting.',
+        includedTrades: ['Electrician', 'Plumber', 'Carpenter', 'Painter'],
+        startingPrice: 4200,
+        estimatedDays: '1 Day',
+      },
+      {
+        id: 'pkg-monsoon',
+        title: 'Monsoon Waterproofing & Surge Hardening',
+        description:
+          'Specialized team deployment to seal rooftop penetrations, verify earth-ground grounding resistance, and treat exterior moisture seepage.',
+        includedTrades: ['Electrician', 'Plumber', 'Painter'],
+        startingPrice: 5800,
+        estimatedDays: '1 - 2 Days',
+      },
+    ],
+  },
+];
+
+export const VERIFIED_WORKERS_FOR_INVITE = [
+  { id: 'inv-suresh', name: 'Suresh Babu', trade: 'Masonry & Tiling Specialist', location: 'Anna Nagar', rating: 4.8 },
+  { id: 'inv-kavitha', name: 'Kavitha Natarajan', trade: 'HVAC Air Quality Inspector', location: 'Adyar', rating: 4.9 },
+  { id: 'inv-mohan', name: 'Mohan Ram', trade: 'Welding & Structural Ironwork', location: 'T. Nagar', rating: 4.7 },
+  { id: 'inv-priya', name: 'Priya Sundar', trade: 'Solar Inverter Technician', location: 'Velachery', rating: 4.9 },
+  { id: 'inv-anand', name: 'Anand G.', trade: 'Smart Home Automation Tech', location: 'Porur', rating: 4.8 },
+];
