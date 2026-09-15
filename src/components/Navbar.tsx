@@ -24,6 +24,7 @@ export const Navbar: React.FC = () => {
     navigate,
     customer,
     worker,
+    activeWorkerId,
     admin,
     bookings,
     resetDemoData,
@@ -56,8 +57,35 @@ export const Navbar: React.FC = () => {
 
   // Active bookings count for customer
   const activeBookingsCount = bookings.filter((b) => b.status !== 'Completed').length;
-  // Pending request count for worker
-  const pendingRequestsCount = bookings.filter((b) => b.status === 'Requested').length;
+  // Pending request count for worker (scoped to active logged-in worker)
+  const pendingRequestsCount = bookings.filter((b) => {
+    if (b.status !== 'Requested') return false;
+    if (activeWorkerId === 'arjun') {
+      return (
+        b.providerId === 'prov-arjun-ac' ||
+        b.providerId === 'arjun-raj' ||
+        b.providerId === 'arjun' ||
+        b.businessName.toLowerCase().includes('arjun')
+      );
+    }
+    if (activeWorkerId === 'ravi') {
+      return (
+        b.providerId === 'prov-ravi-elec' ||
+        b.providerId === 'ravi-kumar' ||
+        b.providerId === 'ravi' ||
+        b.businessName.toLowerCase().includes('ravi')
+      );
+    }
+    if (activeWorkerId === 'kumar') {
+      return (
+        b.providerId === 'prov-kumar-plumb' ||
+        b.providerId === 'kumar-p' ||
+        b.providerId === 'kumar' ||
+        (b.businessName.toLowerCase().includes('kumar') && !b.businessName.toLowerCase().includes('ravi'))
+      );
+    }
+    return b.providerId === activeWorkerId || b.providerName.toLowerCase() === worker.name.toLowerCase();
+  }).length;
 
   const handleRoleSwitch = (newRole: UserRole) => {
     setRole(newRole);
@@ -90,6 +118,7 @@ export const Navbar: React.FC = () => {
       return [
         { id: 'home', label: 'Index', path: '/' },
         { id: 'services', label: 'Find Services', path: '/services' },
+        { id: 'fairmatch', label: 'FairMatch™', path: '/fairmatch' },
         { id: 'my-bookings', label: 'My Bookings', path: '/bookings', badge: activeBookingsCount > 0 ? activeBookingsCount : undefined },
         { id: 'trusted-network', label: 'Trusted Network', path: '/network' },
         { id: 'community-growth-pool', label: 'Growth Pool', path: '/community' },

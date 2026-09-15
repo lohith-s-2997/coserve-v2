@@ -14,6 +14,7 @@ import { HowItWorksView } from './views/HowItWorksView';
 import { ArchitectureView } from './views/ArchitectureView';
 import { DemoGuideView } from './views/DemoGuideView';
 import { ConceptPreviewsView } from './views/ConceptPreviewsView';
+import { FairMatchView } from './views/FairMatchView';
 import { CommunityDemandView } from './views/CommunityDemandView';
 import { CooperativeTeamsView } from './views/CooperativeTeamsView';
 import { FairWorkDistributionView } from './views/FairWorkDistributionView';
@@ -29,6 +30,7 @@ import { DisputeModal } from './components/DisputeModal';
 import { ReplacementSupportModal } from './components/ReplacementSupportModal';
 import { ChooseProfessionalModal } from './components/ChooseProfessionalModal';
 import { TestBookingModal } from './components/TestBookingModal';
+import { ResetDemoModal } from './components/ResetDemoModal';
 import {
   RotateCcw,
   Sparkles,
@@ -56,6 +58,10 @@ const AppContent: React.FC = () => {
     setReplacementModalBooking,
     toastMessage,
     resetDemoData,
+    isResetModalOpen,
+    resetStatus,
+    confirmResetDemo,
+    cancelResetDemo,
     setRole,
     isChooseProfessionalModalOpen,
     setIsChooseProfessionalModalOpen,
@@ -82,6 +88,9 @@ const AppContent: React.FC = () => {
           <Route path="/" element={<HomeView />} />
           <Route path="/services" element={<ServicesDiscoveryView />} />
           <Route path="/find-services" element={<Navigate to="/services" replace />} />
+
+          <Route path="/fairmatch" element={<FairMatchView />} />
+          <Route path="/fair-match" element={<Navigate to="/fairmatch" replace />} />
 
           <Route path="/bookings" element={<MyBookingsView />} />
           <Route path="/bookings/:id" element={<MyBookingsView />} />
@@ -210,6 +219,13 @@ const AppContent: React.FC = () => {
       <TestBookingModal
         isOpen={isTestBookingModalOpen}
         onClose={() => setTestBookingModalOpen(false)}
+      />
+
+      <ResetDemoModal
+        isOpen={isResetModalOpen}
+        status={resetStatus}
+        onConfirm={confirmResetDemo}
+        onCancel={cancelResetDemo}
       />
 
       {/* Editorial Monochrome Footer */}

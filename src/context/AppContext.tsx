@@ -30,6 +30,12 @@ import {
   INITIAL_CUSTOMER_CREDIT_HISTORY,
   INITIAL_TRUSTED_NETWORK,
 } from '../data/stage3Data';
+import {
+  CANONICAL_SEEDED_BOOKINGS,
+  COSERVE_STORAGE_KEYS,
+  WORKER_PROFILES as CANONICAL_WORKER_PROFILES,
+  getCanonicalDemoState,
+} from '../data/canonicalSeedData';
 
 interface AppContextType {
   role: UserRole;
@@ -61,6 +67,11 @@ interface AppContextType {
   }) => Booking;
   updateBookingStatus: (bookingId: string, status: BookingStatus) => void;
   resetDemoData: () => void;
+  isResetModalOpen: boolean;
+  setIsResetModalOpen: (open: boolean) => void;
+  resetStatus: 'confirm' | 'resetting' | 'ready';
+  confirmResetDemo: () => void;
+  cancelResetDemo: () => void;
   toastMessage: string | null;
   showToast: (msg: string) => void;
   selectedCategoryFilter: string;
@@ -110,44 +121,7 @@ interface AppContextType {
   setTestBookingModalOpen: (open: boolean) => void;
 }
 
-export const WORKER_PROFILES: Record<string, ActiveWorker> = {
-  arjun: {
-    id: 'arjun',
-    name: 'Arjun Raj',
-    businessName: 'Arjun AC Services',
-    specialty: 'AC General Service & HVAC Solutions',
-    locality: 'Anna Nagar',
-    cooperativeUnit: 'Anna Nagar Ward 102 Service Cooperative',
-    trade: 'AC Technician',
-    rating: 4.8,
-    completedJobs: 127,
-    earningsBase: 24500,
-  },
-  ravi: {
-    id: 'ravi',
-    name: 'Ravi Kumar',
-    businessName: 'Ravi Electrical Services',
-    specialty: 'Electrical Wiring & Fan Installation',
-    locality: 'T. Nagar',
-    cooperativeUnit: 'Central Urban Trades Council',
-    trade: 'Electrician',
-    rating: 4.7,
-    completedJobs: 98,
-    earningsBase: 19200,
-  },
-  kumar: {
-    id: 'kumar',
-    name: 'Kumar',
-    businessName: 'Kumar Plumbing Services',
-    specialty: 'Leak Detection & Sanitary Fixture Repairs',
-    locality: 'Adyar',
-    cooperativeUnit: 'South District Home Care Guild',
-    trade: 'Plumber',
-    rating: 4.9,
-    completedJobs: 142,
-    earningsBase: 21800,
-  },
-};
+export const WORKER_PROFILES = CANONICAL_WORKER_PROFILES;
 
 const DEMO_CUSTOMER: ActiveCustomer = {
   name: 'Arun Kumar',
@@ -189,6 +163,8 @@ const TAB_ROUTE_MAP: Record<string, string> = {
   'provider-profile': '/provider',
   'trusted-network': '/network',
   'network': '/network',
+  'fairmatch': '/fairmatch',
+  'fair-match': '/fairmatch',
   'community-growth-pool': '/community',
   'community-growth': '/community',
   'customer-credits': '/credits',
@@ -219,6 +195,7 @@ const getTabFromPath = (pathname: string): string => {
   if (pathname.startsWith('/bookings') || pathname === '/my-bookings') return 'my-bookings';
   if (pathname.startsWith('/provider')) return 'provider-profile';
   if (pathname === '/network' || pathname === '/trusted-network') return 'trusted-network';
+  if (pathname === '/fairmatch' || pathname === '/fair-match') return 'fairmatch';
   if (pathname === '/community' || pathname === '/community-growth' || pathname === '/community-growth-pool') return 'community-growth-pool';
   if (pathname === '/credits' || pathname === '/customer-credits' || pathname === '/coserve-credits') return 'customer-credits';
   if (pathname.startsWith('/worker')) return 'worker-dashboard';
@@ -356,7 +333,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [disputeModalBooking, setDisputeModalBooking] = useState<Booking | null>(null);
   const [replacementModalBooking, setReplacementModalBooking] = useState<Booking | null>(null);
 
-  // Load bookings from localStorage
+  // Reset Demo Modal State
+  const [isResetModalOpen, setIsResetModalOpen] = useState(false);
+  const [resetStatus, setResetStatus] = useState<'confirm' | 'resetting' | 'ready'>('confirm');
+
+  // Load bookings from localStorage (with fallback to canonical deep copy)
   const [bookings, setBookings] = useState<Booking[]>(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY_BOOKINGS);
@@ -366,146 +347,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     } catch {
       // fallback
     }
-    return [
-      // Arjun
-      {
-        id: 'book-arjun-1',
-        providerId: 'prov-arjun-ac',
-        providerName: 'Arjun Raj',
-        businessName: 'Arjun AC Services',
-        serviceName: 'AC General Service & Gas Check',
-        scheduledTime: 'Today, 3:00 PM',
-        location: 'Sunshine Apts, Anna Nagar',
-        price: 550,
-        status: 'Requested',
-        paymentStatus: 'Escrow Secured',
-        customerName: 'Arun Kumar',
-        customerPhone: '+91 98401 23891',
-        createdAt: new Date().toISOString(),
-      },
-      {
-        id: 'book-arjun-2',
-        providerId: 'prov-arjun-ac',
-        providerName: 'Arjun Raj',
-        businessName: 'Arjun AC Services',
-        serviceName: 'AC Jet Pressure Cleaning',
-        scheduledTime: 'Today, 11:30 AM',
-        location: 'Kasturba Enclave, Anna Nagar',
-        price: 650,
-        status: 'Accepted',
-        paymentStatus: 'Escrow Secured',
-        customerName: 'Karthik Raman',
-        customerPhone: '+91 98402 33441',
-        createdAt: new Date().toISOString(),
-      },
-      {
-        id: 'book-arjun-3',
-        providerId: 'prov-arjun-ac',
-        providerName: 'Arjun Raj',
-        businessName: 'Arjun AC Services',
-        serviceName: 'Inverter AC Preventive Check',
-        scheduledTime: 'Yesterday',
-        location: 'Park View Residencies',
-        price: 500,
-        status: 'Completed',
-        paymentStatus: 'Paid',
-        customerName: 'Meenakshi Sundaram',
-        customerPhone: '+91 98403 55667',
-        createdAt: new Date(Date.now() - 86400000).toISOString(),
-      },
-      // Ravi
-      {
-        id: 'book-ravi-1',
-        providerId: 'prov-ravi-elec',
-        providerName: 'Ravi Kumar',
-        businessName: 'Ravi Electrical Services',
-        serviceName: 'Ceiling Fan Installation & Wiring',
-        scheduledTime: 'Today, 4:00 PM',
-        location: 'T. Nagar Main Road',
-        price: 350,
-        status: 'Requested',
-        paymentStatus: 'Escrow Secured',
-        customerName: 'Priya Sharma',
-        customerPhone: '+91 98411 11223',
-        createdAt: new Date().toISOString(),
-      },
-      {
-        id: 'book-ravi-2',
-        providerId: 'prov-ravi-elec',
-        providerName: 'Ravi Kumar',
-        businessName: 'Ravi Electrical Services',
-        serviceName: 'Circuit Breaker Diagnostic',
-        scheduledTime: 'Today, 1:00 PM',
-        location: 'Bazaar Street, T. Nagar',
-        price: 450,
-        status: 'Accepted',
-        paymentStatus: 'Escrow Secured',
-        customerName: 'Rajesh Kumar',
-        customerPhone: '+91 98412 22334',
-        createdAt: new Date().toISOString(),
-      },
-      {
-        id: 'book-ravi-3',
-        providerId: 'prov-ravi-elec',
-        providerName: 'Ravi Kumar',
-        businessName: 'Ravi Electrical Services',
-        serviceName: 'Inverter Battery Setup',
-        scheduledTime: 'Yesterday',
-        location: 'South Boag Road',
-        price: 800,
-        status: 'Completed',
-        paymentStatus: 'Paid',
-        customerName: 'Suresh Patel',
-        customerPhone: '+91 98413 33445',
-        createdAt: new Date(Date.now() - 86400000).toISOString(),
-      },
-      // Kumar
-      {
-        id: 'book-kumar-1',
-        providerId: 'prov-kumar-plumb',
-        providerName: 'Kumar',
-        businessName: 'Kumar Plumbing Services',
-        serviceName: 'Tap Leakage Repair & Sealant',
-        scheduledTime: 'Today, 5:00 PM',
-        location: 'Adyar Canal Road',
-        price: 350,
-        status: 'Requested',
-        paymentStatus: 'Escrow Secured',
-        customerName: 'Sneha Reddy',
-        customerPhone: '+91 98421 44556',
-        createdAt: new Date().toISOString(),
-      },
-      {
-        id: 'book-kumar-2',
-        providerId: 'prov-kumar-plumb',
-        providerName: 'Kumar',
-        businessName: 'Kumar Plumbing Services',
-        serviceName: 'Bathroom Pipe Leak Fix',
-        scheduledTime: 'Today, 2:30 PM',
-        location: 'Gandhi Nagar, Adyar',
-        price: 550,
-        status: 'Accepted',
-        paymentStatus: 'Escrow Secured',
-        customerName: 'Vikram Aditya',
-        customerPhone: '+91 98422 55667',
-        createdAt: new Date().toISOString(),
-      },
-      {
-        id: 'book-kumar-3',
-        providerId: 'prov-kumar-plumb',
-        providerName: 'Kumar',
-        businessName: 'Kumar Plumbing Services',
-        serviceName: 'Kitchen Sink Mixer Fitting',
-        scheduledTime: 'Yesterday',
-        location: 'LB Road, Adyar',
-        price: 600,
-        status: 'Completed',
-        paymentStatus: 'Paid',
-        customerName: 'Anitha Murugan',
-        customerPhone: '+91 98423 66778',
-        createdAt: new Date(Date.now() - 86400000).toISOString(),
-      },
-    ];
+    return JSON.parse(JSON.stringify(CANONICAL_SEEDED_BOOKINGS));
   });
 
   const [activeWorkerId, setActiveWorkerIdState] = useState<string>(() => {
@@ -1167,39 +1009,56 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return true;
   };
 
-  const resetDemoData = () => {
+  // Complete Canonical Reset Demo Implementation
+  const performActualReset = () => {
     try {
-      localStorage.removeItem(STORAGE_KEY_BOOKINGS);
-      localStorage.removeItem(STORAGE_KEY_ROLE);
-      localStorage.removeItem(STORAGE_KEY_CLUSTER);
-      localStorage.removeItem(STORAGE_KEY_TEAMS);
-      localStorage.removeItem(STORAGE_KEY_TEAM_REQS);
-      localStorage.removeItem(STORAGE_KEY_INVITATIONS);
-      localStorage.removeItem(STORAGE_KEY_CREDITS);
-      localStorage.removeItem(STORAGE_KEY_REDEEMED);
-      localStorage.removeItem(STORAGE_KEY_GROWTH_BALANCE);
-      localStorage.removeItem(STORAGE_KEY_GROWTH_CONTRIBUTIONS);
-      localStorage.removeItem(STORAGE_KEY_CUSTOMER_CREDITS);
-      localStorage.removeItem(STORAGE_KEY_CUSTOMER_CREDIT_HISTORY);
-      localStorage.removeItem(STORAGE_KEY_TRUSTED_NETWORK);
+      COSERVE_STORAGE_KEYS.forEach((key) => {
+        localStorage.removeItem(key);
+      });
+      // Thoroughly clear any additional coserve-prefixed localStorage items
+      if (typeof window !== 'undefined' && window.localStorage) {
+        const keysToRemove: string[] = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (k && k.toLowerCase().includes('coserve')) {
+            keysToRemove.push(k);
+          }
+        }
+        keysToRemove.forEach((k) => localStorage.removeItem(k));
+      }
     } catch {
       // ignore
     }
+
+    const canonicalState = getCanonicalDemoState();
+
+    // 1. Reset bookings to completely clear queue state
     setBookings([]);
-    setCluster(INITIAL_DEMAND_CLUSTER);
-    setCooperativeTeams(INITIAL_COOP_TEAMS);
+
+    // 2. Reset Stage 2 & 3 states to canonical
+    setCluster(canonicalState.cluster);
+    setCooperativeTeams(canonicalState.cooperativeTeams);
     setTeamRequests([]);
     setWorkerInvitations([]);
-    setGrowthCredits(1240);
-    setRedeemedGrowthItems([]);
-    setGrowthPoolBalance(INITIAL_GROWTH_POOL_BALANCE);
-    setGrowthPoolContributions(INITIAL_COMMUNITY_CONTRIBUTIONS);
-    setCustomerCredits(INITIAL_CUSTOMER_CREDITS);
-    setCustomerCreditHistory(INITIAL_CUSTOMER_CREDIT_HISTORY);
-    setTrustedNetwork(INITIAL_TRUSTED_NETWORK);
-    setRoleState('customer');
+    setGrowthCredits(canonicalState.growthCredits);
+    setRedeemedGrowthItems(canonicalState.redeemedGrowthItems);
+    setGrowthPoolBalance(canonicalState.growthPoolBalance);
+    setGrowthPoolContributions(canonicalState.growthPoolContributions);
+    setCustomerCredits(canonicalState.customerCredits);
+    setCustomerCreditHistory(canonicalState.customerCreditHistory);
+    setTrustedNetwork(canonicalState.trustedNetwork);
+
+    // 3. Reset roles & perspective
+    setRoleState(canonicalState.role);
+    setActiveWorkerIdState(canonicalState.activeWorkerId);
+
+    // 4. Reset views & filters
     setActiveTab('home');
     setSelectedProvider(null);
+    setSelectedCategoryFilter('all');
+    setSelectedLocalityFilter('All Localities');
+
+    // 5. Close all modals
     setFairMatchModalProvider(null);
     setBookingModalProvider(null);
     setPaymentModalBooking(null);
@@ -1207,9 +1066,38 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setRatingModalBooking(null);
     setDisputeModalBooking(null);
     setReplacementModalBooking(null);
-    setSelectedCategoryFilter('all');
-    setSelectedLocalityFilter('All Localities');
-    showToast('Demo environment reset to initial clean state.');
+    setIsChooseProfessionalModalOpen(false);
+    setTestBookingModalOpen(false);
+
+    // 6. Navigate to Home
+    if (location.pathname !== '/') {
+      navigate('/');
+    }
+
+    showToast('CoServe has been restored to its original demonstration state.');
+  };
+
+  // User clicks "Reset Demo" anywhere -> opens confirmation modal
+  const resetDemoData = () => {
+    setResetStatus('confirm');
+    setIsResetModalOpen(true);
+  };
+
+  const confirmResetDemo = () => {
+    setResetStatus('resetting');
+    setTimeout(() => {
+      performActualReset();
+      setResetStatus('ready');
+      setTimeout(() => {
+        setIsResetModalOpen(false);
+        setResetStatus('confirm');
+      }, 700);
+    }, 400);
+  };
+
+  const cancelResetDemo = () => {
+    setIsResetModalOpen(false);
+    setResetStatus('confirm');
   };
 
   return (
@@ -1237,6 +1125,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         createBooking,
         updateBookingStatus,
         resetDemoData,
+        isResetModalOpen,
+        setIsResetModalOpen,
+        resetStatus,
+        confirmResetDemo,
+        cancelResetDemo,
         toastMessage,
         showToast,
         selectedCategoryFilter,

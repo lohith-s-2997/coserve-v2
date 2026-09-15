@@ -390,12 +390,21 @@ export const HomeView: React.FC = () => {
                 <div className="text-xs uppercase tracking-wider text-white/50">
                   ARJUN AC SERVICES • WARD 102
                 </div>
-                <button
-                  onClick={() => setFairMatchModalProvider(arjunProvider)}
-                  className="mt-4 px-5 py-2.5 bg-[#CCFF00] text-[#0A0A0A] text-xs font-bold uppercase tracking-wider hover:bg-[#D4FF00] transition"
-                >
-                  Inspect Transparent Weights
-                </button>
+                <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2 mt-4">
+                  <button
+                    onClick={() => navigate('/fairmatch')}
+                    className="px-5 py-2.5 bg-[#CCFF00] text-[#0A0A0A] text-xs font-bold uppercase tracking-wider hover:bg-[#D4FF00] transition flex items-center gap-1.5"
+                  >
+                    <span>Launch FairMatch Studio</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    onClick={() => setFairMatchModalProvider(arjunProvider)}
+                    className="px-4 py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-bold uppercase tracking-wider transition"
+                  >
+                    Quick Modal
+                  </button>
+                </div>
               </div>
 
               {/* Radiating Factor Telemetry */}

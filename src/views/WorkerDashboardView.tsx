@@ -85,11 +85,37 @@ export const WorkerDashboardView: React.FC = () => {
     setInviteModalOpen(false);
   };
 
-  // Find incoming or active bookings assigned to current active worker
-  const workerBookings = bookings.filter(
-    (b) => b.businessName.toLowerCase().includes(worker.businessName.toLowerCase().split(' ')[0]) ||
-           b.providerName.toLowerCase().includes(worker.name.toLowerCase().split(' ')[0])
-  );
+  // Find incoming or active bookings assigned to current active worker using stable identifiers
+  const workerBookings = bookings.filter((b) => {
+    if (activeWorkerId === 'arjun') {
+      return (
+        b.providerId === 'prov-arjun-ac' ||
+        b.providerId === 'arjun-raj' ||
+        b.providerId === 'arjun' ||
+        b.businessName.toLowerCase().includes('arjun')
+      );
+    }
+    if (activeWorkerId === 'ravi') {
+      return (
+        b.providerId === 'prov-ravi-elec' ||
+        b.providerId === 'ravi-kumar' ||
+        b.providerId === 'ravi' ||
+        b.businessName.toLowerCase().includes('ravi')
+      );
+    }
+    if (activeWorkerId === 'kumar') {
+      return (
+        b.providerId === 'prov-kumar-plumb' ||
+        b.providerId === 'kumar-p' ||
+        b.providerId === 'kumar' ||
+        (b.businessName.toLowerCase().includes('kumar') && !b.businessName.toLowerCase().includes('ravi'))
+      );
+    }
+    return (
+      b.providerId === activeWorkerId ||
+      b.providerName.toLowerCase() === worker.name.toLowerCase()
+    );
+  });
 
   return (
     <div className="w-full bg-[#F5F5F2] text-[#0A0A0A] font-mono-code min-h-screen py-8 px-4 sm:px-6 lg:px-8 space-y-8">

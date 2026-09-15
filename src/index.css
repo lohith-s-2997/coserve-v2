@@ -110,3 +110,83 @@ h1, h2, h3, .font-display {
 .animate-pulse-node {
   animation: pulse-node 2.6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
+
+/* FairMatch CSS/SVG Data Packet Movement Animations */
+@keyframes svgDashFlow {
+  from {
+    stroke-dashoffset: 40;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes svgDashReverse {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: 40;
+  }
+}
+
+@keyframes packetPulseGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 3px #CCFF00);
+    opacity: 0.85;
+  }
+  50% {
+    filter: drop-shadow(0 0 10px #CCFF00);
+    opacity: 1;
+  }
+}
+
+@keyframes radarSweep {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes scannerLine {
+  0% {
+    top: 0%;
+    opacity: 0.2;
+  }
+  50% {
+    top: 95%;
+    opacity: 0.9;
+  }
+  100% {
+    top: 0%;
+    opacity: 0.2;
+  }
+}
+
+.animate-svg-dash-flow {
+  animation: svgDashFlow 1.2s linear infinite;
+}
+
+.animate-svg-dash-flow-fast {
+  animation: svgDashFlow 0.6s linear infinite;
+}
+
+.animate-svg-dash-reverse {
+  animation: svgDashReverse 1.2s linear infinite;
+}
+
+.animate-packet-glow {
+  animation: packetPulseGlow 1.5s ease-in-out infinite;
+}
+
+.animate-radar-sweep {
+  transform-origin: center;
+  animation: radarSweep 4s linear infinite;
+}
+
+.animate-scanner-line {
+  animation: scannerLine 2.5s ease-in-out infinite;
+}
+

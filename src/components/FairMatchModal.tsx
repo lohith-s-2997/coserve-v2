@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { Provider } from '../types';
 import {
@@ -20,6 +21,7 @@ interface FairMatchModalProps {
 }
 
 export const FairMatchModal: React.FC<FairMatchModalProps> = ({ provider, onClose, onSelectBook }) => {
+  const navigate = useNavigate();
   const [simulationMode, setSimulationMode] = useState<'balanced' | 'proximity' | 'fairness'>('balanced');
 
   if (!provider) return null;
@@ -212,6 +214,16 @@ export const FairMatchModal: React.FC<FairMatchModalProps> = ({ provider, onClos
               Audit Hash: <span className="font-mono-code text-white">SHA256-FM93-CHENNAI</span>
             </div>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+              <button
+                onClick={() => {
+                  onClose();
+                  navigate('/fairmatch');
+                }}
+                className="px-4 py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 text-[#CCFF00] text-xs font-bold uppercase tracking-wider text-center flex items-center justify-center gap-1.5 transition"
+              >
+                <span>Full Animated Engine</span>
+                <ArrowRight className="w-3 h-3" />
+              </button>
               <button
                 onClick={onClose}
                 className="px-5 py-2.5 text-xs text-white/70 hover:text-white uppercase tracking-wider text-center"
